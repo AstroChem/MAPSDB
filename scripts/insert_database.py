@@ -1,9 +1,19 @@
+"""
+Insert all of the data contained in the line and disk dictionaries into the database.
+"""
+
+import os
+
 from sqlalchemy import create_engine
-import schema
 
+# insert the disk data
+from diskdictionary import disk_dict
 from linedictionary import line_dict
+from mapsdb import schema
 
-engine = create_engine("sqlite:///MAPS.db")
+URI = os.environ["SQLALCHEMY_DATABASE_URI"]
+
+engine = create_engine(URI)
 conn = engine.connect()
 
 # fill in the simple spw table
@@ -63,8 +73,6 @@ for key, (setup, band) in setup_dict.items():
                 setup_id=setup,
             )
 
-# insert the disk data
-from diskdictionary import disk_dict
 
 for v in disk_dict.values():
     conn.execute(
@@ -83,3 +91,5 @@ for v in disk_dict.values():
         RA_center=v["RA_center"],
         Dec_center=v["Dec_center"],
     )
+
+conn.close()

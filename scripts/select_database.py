@@ -1,8 +1,11 @@
 from sqlalchemy import create_engine, select
-import schema 
+from mapsdb import schema 
 
+import os
 
-engine = create_engine("sqlite:///MAPS.db")
+URI = os.environ['SQLALCHEMY_DATABASE_URI']
+
+engine = create_engine(URI)
 conn = engine.connect()
 
 s = select([schema.transitions])

@@ -11,6 +11,17 @@ pip install -e .
 
 Using alembic.
 
+## Running
+
+Before running any scripts, it's assumed that you have configured the following environment variable to point to the absolute path of the SQLITE database on your system.
+
+    $ export SQLALCHEMY_DATABASE_URI="/path/to/your/data.db"
+
+Note that for the SQLITE databases, four backslashes are needed to represent the absolute path. I.e.,
+
+    $ export SQLALCHEMY_DATABASE_URI="sqlite:////Users/ianczekala/Documents/MAPS/MAPS.db"
+
+
 ---
 
 Version : 
