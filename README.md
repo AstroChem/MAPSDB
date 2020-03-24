@@ -9,7 +9,9 @@ pip install -e .
 
 ## Database Migration
 
-Using alembic.
+Using alembic. Make changes to schema in `mapsdb/schema.py`. Commit changes to git (not necessary, but good idea).
+
+
 
 ## Running
 
