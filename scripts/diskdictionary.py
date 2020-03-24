@@ -5,9 +5,9 @@ disk_dict['GM_Aur'] = {'name': 'GM Aur',
                        'incl': 53.21, #inclination in degrees, Huang et al. (2020)
                        'PA': 57.17, #position angle in degrees, Huang et al. (2020)
                        'PA_gofish': 57.17 + 180.0, #position angle in degrees, corrected for gofish
-                       'Teff': 4786, #Kelvin, Andrews et al. 2013
-                       'L_star': 1.58, #stellar luminosity in solar luminosities, Andrews et al. 2013
-                       'M_star': 1.32, #stellar mass in solar masses, Andrews et al. 2018a
+                       'Teff': 4350, #Kelvin, Macias et al. 2018
+                       'L_star': 1.2, #stellar luminosity in solar luminosities, Macias et al. 2018
+                       'M_star': 1.1, #stellar mass in solar masses, Macias et al. 2018
                        'logMdot': -8.1, #log of stellar accretion rate in solar masses/yr (GM Aur is variable!), Ingleby et al. 2013
                        'v_sys': 5.61, #LSR systemic velocity [km/s]; Huang et al. (2020)
                        '12CO_extent' : 14, # km/s, measured in v0 images
@@ -15,7 +15,7 @@ disk_dict['GM_Aur'] = {'name': 'GM Aur',
                        'Dec_center': '+030.21.58.879285'
 }
 
-disk_dict['MWC_480'] = {'name': 'MWC 480',
+disk_dict['MWC_480'] = {'name': 'MWC_480',
                         'distance':161.8, #[pc], from Gaia DR2
                         'incl':37, #[degrees], Liu et al. (2019)
                         'PA':148, #[degrees], Liu et al. (2019)
@@ -32,7 +32,7 @@ disk_dict['MWC_480'] = {'name': 'MWC 480',
                         'Dec_center' : '+029.50.36.481036'
                        }
 
-disk_dict['AS_209'] = {'name': 'AS 209',
+disk_dict['AS_209'] = {'name': 'AS_209',
                        'distance': 121, #source distance in pc, from Gaia Collaboration 2018,
                        'incl': 34.97, #inclination in degrees, Huang et al. 2018b
                        'PA': 85.76, #position angle in degrees, Huang et al. 2018b
@@ -47,7 +47,7 @@ disk_dict['AS_209'] = {'name': 'AS 209',
                        'Dec_center' : '-014.22.09.092905'
 }
 
-disk_dict['IM_Lup'] = {'name': "IM Lup",
+disk_dict['IM_Lup'] = {'name': "IM_Lup",
                        'distance': 158, #source distance in pc, from Gaia Collaboration 2018,
                        'incl': 47.5, #inclination in degrees, Huang et al. 2018b
                        'PA': 144.5, #position angle in degrees, Huang et al. 2018b
@@ -62,7 +62,7 @@ disk_dict['IM_Lup'] = {'name': "IM Lup",
                        'Dec_center': '-37.56.06.579654'
 }
 
-disk_dict['HD_163296'] = {'name': "HD 163296",
+disk_dict['HD_163296'] = {'name': "HD_163296",
                           'distance': 101, #source distance in pc, from Gaia Collaboration 2018,
                           'incl': 46.7, #inclination in degrees, Huang et al. 2018b
                           'PA': 133.3, #position angle in degrees, Huang et al. 2018b
