@@ -7,7 +7,8 @@ from sqlalchemy import (
     String,
     DateTime,
     ForeignKey,
-    PrimaryKeyConstraint
+    PrimaryKeyConstraint,
+    ForeignKeyConstraint
 )
 
 metadata = MetaData()
@@ -80,6 +81,7 @@ run_statuses = Table(
 # reference table for tclean / RML
 method_types = Table(
     "method_types",
+    metadata,
     Column("method_type_id", Integer(), primary_key=True),
     Column("method_type", String(), unique=True)
 )
@@ -87,6 +89,7 @@ method_types = Table(
 # MPoL dev 0.5, or tclean v2
 method_implementations = Table(
     "method_implementations",
+    metadata,
     Column("method_type", ForeignKey("method_types.method_type")),
     Column("method_version", String()),
     PrimaryKeyConstraint("method_type", "method_version", name="method_implementation_id")
@@ -94,6 +97,7 @@ method_implementations = Table(
 
 parameters = Table(
     "parameters",
+    metadata,
     Column("parameter_id", Integer(), primary_key=True),
     Column("npix", Integer()),
     Column("cell_size", Float()),
@@ -106,8 +110,8 @@ parameters = Table(
 # summarizing how we prepare and track all SLURM runs for RML
 runs = Table(
     "runs",
+    metadata,
     Column("runs_id", Integer(), primary_key=True),
-    Column("ms_id", ForeignKey("measurement_sets.ms_id")),
     Column("run_status", ForeignKey("run_statuses.run_status_id")),
     Column("job_array_id", Integer()),
     Column("slurm_id", Integer()),
@@ -116,12 +120,19 @@ runs = Table(
     Column("channel_start", Integer()),
     Column("channel_end", Integer()),
     Column("parameter_id", ForeignKey("parameters.parameter_id")),
-    Column("method_implementation_id", ForeignKey("method_implementations.method_implementation_id"))
+    Column("disk_id", Integer(), nullable=False),
+    Column("transition_id", Integer(), nullable=False),
+    Column("version", Integer(), nullable=False),
+    ForeignKeyConstraint(["disk_id", "transition_id", "version"], ["measurement_sets.disk_id", "measurement_sets.transition_id", "measurement_sets.version"], name="ms_id"),
+    Column("method_type", String()),
+    Column("method_version", String()),
+    ForeignKeyConstraint(["method_type", "method_version"], ["method_implementations.method_type", "method_implementations.method_version"], name="method_implementation_id")
 )
 
 # image, dirty_image, vis
 cube_types = Table(
     "cube_types",
+    metadata,
     Column("cube_type_id", Integer(), primary_key=True),
     Column("cube_type", String())
 )
@@ -129,6 +140,7 @@ cube_types = Table(
 # for individual jpgs: plot, im, vis
 img_types = Table(
     "img_types",
+    metadata,
     Column("img_type_id", Integer(), primary_key=True),
     Column("img_type", String())
 )
@@ -137,22 +149,27 @@ img_types = Table(
 # e.g., a dirty image,
 cubes = Table(
     "cubes",
+    metadata,
     Column("cube_id", Integer(), primary_key=True),
-    Column("ms_id", ForeignKey("measurement_sets.ms_id")),
     Column("run_id", ForeignKey("runs.run_id")),
-    Column("method_implementation_id", ForeignKey("method_implementations.method_implementation_id")),
-    Column("disk_id", ForeignKey("disks.disk_id")),
-    Column("transition_id", ForeignKey("transitions.transition_id"))
+    Column("disk_id", Integer(), nullable=False),
+    Column("transition_id", Integer(), nullable=False),
+    Column("version", Integer(), nullable=False),
+    ForeignKeyConstraint(["disk_id", "transition_id", "version"], ["measurement_sets.disk_id", "measurement_sets.transition_id", "measurement_sets.version"], name="ms_id"),
+    Column("method_type", String()),
+    Column("method_version", String()),
+    ForeignKeyConstraint(["method_type", "method_version"], ["method_implementations.method_type", "method_implementations.method_version"], name="method_implementation_id")
 )
 
-images = Table(
-    "images",
-    Column("image_id", Integer(), primary_key=True),
-    Column("cube_id", ForeignKey("cubes.cube_id")),
-    Column("run_id", ForeignKey("runs.run_id")),
-    Column("image_path", String()),
-    Column("channel", Integer()),
-    Column("velocity", Float())
-)
+# images = Table(
+#     "images",
+#     metadata,
+#     Column("image_id", Integer(), primary_key=True),
+#     Column("cube_id", ForeignKey("cubes.cube_id")),
+#     Column("run_id", ForeignKey("runs.run_id")),
+#     Column("image_path", String()),
+#     Column("channel", Integer()),
+#     Column("velocity", Float())
+# )
 
 

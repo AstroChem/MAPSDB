@@ -9,7 +9,13 @@ pip install -e .
 
 ## Database Migration
 
-Using alembic. Make changes to schema in `mapsdb/schema.py`. Commit changes to git (not necessary, but good idea).
+Using alembic. 
+
+1. Make changes to schema in `mapsdb/schema.py`. 
+2. Commit changes to git (not necessary, but good idea).
+3. do autogeneration with $ alembic revision --autogenerate -m "message here". If the upgrade is tricky (including multiple primary key constraints, for example) do this manually by leaving --autogenerate off
+4. Open `versions/XX_import_schema.py` and edit if necessary
+5. apply with $ alembic upgrade head
 
 
 
