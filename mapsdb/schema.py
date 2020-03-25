@@ -111,7 +111,7 @@ parameters = Table(
 runs = Table(
     "runs",
     metadata,
-    Column("runs_id", Integer(), primary_key=True),
+    Column("run_id", Integer(), primary_key=True),
     Column("run_status", ForeignKey("run_statuses.run_status_id")),
     Column("job_array_id", Integer()),
     Column("slurm_id", Integer()),
@@ -146,7 +146,7 @@ img_types = Table(
 )
 
 # referencing or will reference a collection of images (pngs or jpgs) made from one of the products. 
-# e.g., a dirty image,
+# # e.g., a dirty image,
 cubes = Table(
     "cubes",
     metadata,
@@ -161,15 +161,15 @@ cubes = Table(
     ForeignKeyConstraint(["method_type", "method_version"], ["method_implementations.method_type", "method_implementations.method_version"], name="method_implementation_id")
 )
 
-# images = Table(
-#     "images",
-#     metadata,
-#     Column("image_id", Integer(), primary_key=True),
-#     Column("cube_id", ForeignKey("cubes.cube_id")),
-#     Column("run_id", ForeignKey("runs.run_id")),
-#     Column("image_path", String()),
-#     Column("channel", Integer()),
-#     Column("velocity", Float())
-# )
+images = Table(
+    "images",
+    metadata,
+    Column("image_id", Integer(), primary_key=True),
+    Column("cube_id", ForeignKey("cubes.cube_id")),
+    Column("run_id", ForeignKey("runs.run_id")),
+    Column("image_path", String()),
+    Column("channel", Integer()),
+    Column("velocity", Float())
+)
 
 
