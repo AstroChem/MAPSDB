@@ -11,8 +11,15 @@ from sqlalchemy import (
     ForeignKeyConstraint
 )
 
-metadata = MetaData()
+convention = {
+  "ix": 'ix_%(column_0_label)s',
+  "uq": "uq_%(table_name)s_%(column_0_name)s",
+  "ck": "ck_%(table_name)s_%(constraint_name)s",
+  "fk": "fk_%(table_name)s_%(column_0_name)s_%(referred_table_name)s",
+  "pk": "pk_%(table_name)s"
+}
 
+metadata = MetaData(naming_convention=convention)
 
 spws = Table("spws", metadata, Column("spw_id", Integer(), primary_key=True))
 
@@ -33,7 +40,7 @@ transitions = Table(
     metadata,
     Column("transition_id", Integer(), primary_key=True),
     Column("frequency", Float(), nullable=False, unique=True),
-    Column("mol_id", ForeignKey("molecules.molecule_name")),
+    Column("molecule_name", ForeignKey("molecules.molecule_name")),
     Column("quantum_number", String()),
     Column("spw_id", ForeignKey("spws.spw_id")),
     Column("band_id", ForeignKey("bands.band_id")),
@@ -66,6 +73,7 @@ measurement_sets = Table(
     Column("disk_id", ForeignKey("disks.disk_id")),
     Column("path", String(), unique=True),
     Column("version", String()),
+    Column("tar_md5sum", String(), unique=True), # the md5sum corresponding to the .tar.gz file ingested. 
     Column("ingested", DateTime()),
     PrimaryKeyConstraint("disk_id", "transition_id", "version", name="ms_id")
 )
@@ -129,20 +137,12 @@ runs = Table(
     ForeignKeyConstraint(["method_type", "method_version"], ["method_implementations.method_type", "method_implementations.method_version"], name="method_implementation_id")
 )
 
-# image, dirty_image, vis
-cube_types = Table(
-    "cube_types",
+# what is the image of? image, bkg, amp, vis, dirty, etc...
+image_types = Table(
+    "image_types",
     metadata,
-    Column("cube_type_id", Integer(), primary_key=True),
-    Column("cube_type", String())
-)
-
-# for individual jpgs: plot, im, vis
-img_types = Table(
-    "img_types",
-    metadata,
-    Column("img_type_id", Integer(), primary_key=True),
-    Column("img_type", String())
+    Column("image_type_id", Integer(), primary_key=True),
+    Column("image_type", String(), unique=True)
 )
 
 # referencing or will reference a collection of images (pngs or jpgs) made from one of the products. 
@@ -165,6 +165,7 @@ images = Table(
     "images",
     metadata,
     Column("image_id", Integer(), primary_key=True),
+    Column("image_type_id", Integer(), ForeignKey("images.image_type_id")),
     Column("cube_id", ForeignKey("cubes.cube_id")),
     Column("run_id", ForeignKey("runs.run_id")),
     Column("image_path", String()),

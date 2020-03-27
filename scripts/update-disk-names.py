@@ -1,7 +1,7 @@
 # run through and update the disk table with the latest properties in the disk dictionary
 import os
 
-from sqlalchemy import create_engine
+from sqlalchemy import create_engine, select
 
 # insert the disk data
 # load the new disk dictionary
@@ -12,7 +12,7 @@ from mapsdb import schema
 # replace all "names" with the correct spaced versions
 # uses the key in disk_dict -> name
 name_conv = {
-    "GM_Aur": "GM Aur",
+    "GM Aur": "GM Aur",
     "MWC_480": "MWC 480",
     "AS_209": "AS 209",
     "IM_Lup": "IM Lup",
@@ -21,29 +21,34 @@ name_conv = {
 
 URI = os.environ["SQLALCHEMY_DATABASE_URI"]
 
+print("BEFORE")
+engine = create_engine(URI)
+with engine.begin() as conn:
+
+    s = select([schema.disks])
+    result = conn.execute(s)
+    for row in result.fetchall():
+        print(row)
+
 
 engine = create_engine(URI)
 with engine.begin() as conn:
 
+    # iterate throught the keys of the disk dictionary
     for k, v in disk_dict.items():
         conn.execute(
             schema.disks.update()
-            .where(schema.disks.c.disk_name == name_conv[k])
+            .where(schema.disks.c.disk_name == v["name"])
             .values(
-                disk_name=name_conv[k],
-                distance=v["distance"],
-                incl=v["incl"],
-                PA=v["PA"],
-                PA_gofish=v["PA_gofish"],
-                T_eff=v["Teff"],
-                L_star=v["L_star"],
-                M_star=v["M_star"],
-                logMdot=v["logMdot"],
-                v_sys=v["v_sys"],
-                CO_ext=v["12CO_extent"],
-                RA_center=v["RA_center"],
-                Dec_center=v["Dec_center"],
+                disk_name=name_conv[v["name"]]
             )
         )
 
-conn.close()
+print("AFTER")
+engine = create_engine(URI)
+with engine.begin() as conn:
+
+    s = select([schema.disks])
+    result = conn.execute(s)
+    for row in result.fetchall():
+        print(row)
