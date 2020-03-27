@@ -130,3 +130,6 @@ dmypy.json
 
 # vscode
 .vscode/
+
+# ignore the actual alembic migration scripts, these only make sense locally.
+migrations/versions/
