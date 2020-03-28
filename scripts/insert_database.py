@@ -18,15 +18,15 @@ with engine.begin() as conn:
 
     # fill in the simple spw table
     for i in range(8):
-        conn.execute(schema.spws.insert(), spw_id=i)
+        conn.execute(schema.spws.insert().values(spw_id=i))
 
     # fill in the bands
-    conn.execute(schema.bands.insert(), band_id=3)
-    conn.execute(schema.bands.insert(), band_id=6)
+    conn.execute(schema.bands.insert().values(band_id=3))
+    conn.execute(schema.bands.insert().values(band_id=6))
 
     # fill in the setups
     for i in range(2):
-        conn.execute(schema.setups.insert(), setup_id=i)
+        conn.execute(schema.setups.insert().values(setup_id=i))
 
 
     # get all the unique keys of molecule names
@@ -36,7 +36,7 @@ with engine.begin() as conn:
             mol_list.add(key)
 
     for mol in mol_list:
-        conn.execute(schema.molecules.insert(), molecule_name=mol)
+        conn.execute(schema.molecules.insert().values(molecule_name=mol))
 
     # do setup1B3
     setup_dict = {
@@ -51,32 +51,35 @@ with engine.begin() as conn:
         for mol, vdict in d.items():
             if "spw" not in vdict.keys():
                 # go to a lower level
-                for junk, vvdict in vdict.items():
+                for transition_letter, vvdict in vdict.items():
                     conn.execute(
-                        schema.transitions.insert(),
+                        schema.transitions.insert().values(
                         frequency=vvdict["freq"],
-                        mol_id=mol,
+                        molecule_name=mol,
+                        transition_letter=transition_letter,
                         quantum_number=vvdict["qn"],
                         spw_id=int(vvdict["spw"]),
                         band_id=band,
                         setup_id=setup,
-                    )
+                    ))
             else:
-                # insert the values
+                # there is no transition letter if we didn't
+                # jump to a lower level
                 conn.execute(
-                    schema.transitions.insert(),
+                    schema.transitions.insert().values(
                     frequency=vdict["freq"],
-                    mol_id=mol,
+                    molecule_name=mol,
+                    transition_letter=None, 
                     quantum_number=vdict["qn"],
                     spw_id=int(vdict["spw"]),
                     band_id=band,
                     setup_id=setup,
-                )
+                ))
 
 
     for v in disk_dict.values():
         conn.execute(
-            schema.disks.insert(),
+            schema.disks.insert().values(
             disk_name=v["name"],
             distance=v["distance"],
             incl=v["incl"],
@@ -90,7 +93,7 @@ with engine.begin() as conn:
             CO_ext=v["12CO_extent"],
             RA_center=v["RA_center"],
             Dec_center=v["Dec_center"],
-        )
+        ))
 
     # insert the reference table keys
     # prepped: run parameters entered into dictionary, sbatch scripts prepared
@@ -100,16 +103,16 @@ with engine.begin() as conn:
     # mpol_completed: mpol finished, waiting to be plotted
     # plot_completed: plots successfully generated from mpol output
     for i, status in enumerate(["prepped", "submitted", "running",  "failed", "mpol_completed", "plot_completed"]):
-        conn.execute(schema.run_statuses.insert(), run_status_id=i, run_status=status)
+        conn.execute(schema.run_statuses.insert().values(run_status_id=i, run_status=status))
 
     for i, method_type in enumerate(["tclean", "rml"]):
-        conn.execute(schema.method_types.insert(), method_type_id=i, method_type=method_type)
+        conn.execute(schema.method_types.insert().values(method_type_id=i, method_type=method_type))
 
 
-    conn.execute(schema.method_implementations.insert(), method_type=0, method_version="v1") # tclean v1
-    conn.execute(schema.method_implementations.insert(), method_type=0,  method_version="v2") # tclean v2
-    conn.execute(schema.method_implementations.insert(), method_type=1, method_version=0) # RML unspecified version
+    conn.execute(schema.method_implementations.insert().values(method_type=0, method_version="v1")) # tclean v1
+    conn.execute(schema.method_implementations.insert().values(method_type=0,  method_version="v2")) # tclean v2
+    conn.execute(schema.method_implementations.insert().values(method_type=1, method_version=0)) # RML unspecified version
 
     # cube types 
     for i, image_type in enumerate(["image", "background", "dirty", "vis", "amplitude", "plot"]):
-        conn.execute(schema.image_types.insert(), image_type_id=i, image_type=image_type)
+        conn.execute(schema.image_types.insert().values(image_type_id=i, image_type=image_type))

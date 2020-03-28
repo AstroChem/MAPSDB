@@ -41,6 +41,7 @@ transitions = Table(
     Column("transition_id", Integer(), primary_key=True),
     Column("frequency", Float(), nullable=False, unique=True),
     Column("molecule_name", ForeignKey("molecules.molecule_name")),
+    Column("transition_letter", String()),
     Column("quantum_number", String()),
     Column("spw_id", ForeignKey("spws.spw_id")),
     Column("band_id", ForeignKey("bands.band_id")),
