@@ -99,9 +99,9 @@ method_types = Table(
 method_implementations = Table(
     "method_implementations",
     metadata,
-    Column("method_type", ForeignKey("method_types.method_type")),
+    Column("method_type_id", ForeignKey("method_types.method_type_id")),
     Column("method_version", String()),
-    PrimaryKeyConstraint("method_type", "method_version", name="method_implementation_id")
+    PrimaryKeyConstraint("method_type_id", "method_version", name="method_implementation_id")
 )
 
 parameters = Table(
@@ -121,7 +121,7 @@ runs = Table(
     "runs",
     metadata,
     Column("run_id", Integer(), primary_key=True),
-    Column("run_status", ForeignKey("run_statuses.run_status_id")),
+    Column("run_status_id", ForeignKey("run_statuses.run_status_id")),
     Column("job_array_id", Integer()),
     Column("slurm_id", Integer()),
     Column("updated", DateTime()),
@@ -133,9 +133,9 @@ runs = Table(
     Column("transition_id", Integer(), nullable=False),
     Column("version", Integer(), nullable=False),
     ForeignKeyConstraint(["disk_id", "transition_id", "version"], ["measurement_sets.disk_id", "measurement_sets.transition_id", "measurement_sets.version"], name="ms_id"),
-    Column("method_type", String()),
+    Column("method_type_id", Integer()),
     Column("method_version", String()),
-    ForeignKeyConstraint(["method_type", "method_version"], ["method_implementations.method_type", "method_implementations.method_version"], name="method_implementation_id")
+    ForeignKeyConstraint(["method_type_id", "method_version"], ["method_implementations.method_type_id", "method_implementations.method_version"], name="method_implementation_id")
 )
 
 # what is the image of? image, bkg, amp, vis, dirty, etc...
@@ -157,9 +157,9 @@ cubes = Table(
     Column("transition_id", Integer(), nullable=False),
     Column("version", Integer(), nullable=False),
     ForeignKeyConstraint(["disk_id", "transition_id", "version"], ["measurement_sets.disk_id", "measurement_sets.transition_id", "measurement_sets.version"], name="ms_id"),
-    Column("method_type", String()),
+    Column("method_type_id", Integer()),
     Column("method_version", String()),
-    ForeignKeyConstraint(["method_type", "method_version"], ["method_implementations.method_type", "method_implementations.method_version"], name="method_implementation_id")
+    ForeignKeyConstraint(["method_type_id", "method_version"], ["method_implementations.method_type_id", "method_implementations.method_version"], name="method_implementation_id")
 )
 
 images = Table(

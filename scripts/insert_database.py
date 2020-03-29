@@ -108,7 +108,6 @@ with engine.begin() as conn:
     for i, method_type in enumerate(["tclean", "rml"]):
         conn.execute(schema.method_types.insert().values(method_type_id=i, method_type=method_type))
 
-
     conn.execute(schema.method_implementations.insert().values(method_type=0, method_version="v1")) # tclean v1
     conn.execute(schema.method_implementations.insert().values(method_type=0,  method_version="v2")) # tclean v2
     conn.execute(schema.method_implementations.insert().values(method_type=1, method_version=0)) # RML unspecified version
