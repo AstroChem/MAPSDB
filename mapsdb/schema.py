@@ -8,7 +8,8 @@ from sqlalchemy import (
     DateTime,
     ForeignKey,
     PrimaryKeyConstraint,
-    ForeignKeyConstraint
+    ForeignKeyConstraint,
+    UniqueConstraint
 )
 
 convention = {
@@ -70,13 +71,14 @@ disks = Table(
 measurement_sets = Table(
     "measurement_sets",
     metadata,
-    Column("transition_id", ForeignKey("transitions.transition_id")),
-    Column("disk_id", ForeignKey("disks.disk_id")),
+    Column("measurement_set_id", Integer(), primary_key=True),
+    Column("transition_id", ForeignKey("transitions.transition_id"), nullable=False),
+    Column("disk_id", ForeignKey("disks.disk_id"), nullable=False),
     Column("path", String(), unique=True),
-    Column("version", String()),
+    Column("version", String(), nullable=False),
     Column("tar_md5sum", String(), unique=True), # the md5sum corresponding to the .tar.gz file ingested. 
     Column("ingested", DateTime()),
-    PrimaryKeyConstraint("disk_id", "transition_id", "version", name="ms_id")
+    PrimaryKeyConstraint("measurement_set_id")
 )
 
 # meant to be a reference table of prepped, submitted, running, completed, analysis, etc.
@@ -113,7 +115,11 @@ parameters = Table(
     Column("n_opt", Integer()),
     Column("loss_rate", Float()),
     Column("penalty_entropy", Float()),
-    Column("penalty_tsv", Float())
+    Column("entropy_quantum", Float()),
+    Column("penalty_tsv", Float()),
+    Column("robust", Float()),
+    Column("penalty_PSD", Float()),
+    Column("PSD_l", Float())
 )
 
 # summarizing how we prepare and track all SLURM runs for RML
@@ -124,26 +130,24 @@ runs = Table(
     Column("run_status_id", ForeignKey("run_statuses.run_status_id")),
     Column("job_array_id", Integer()),
     Column("slurm_id", Integer()),
+    Column("slurm_id_array", String()),
     Column("updated", DateTime()),
     Column("output_dir", String()),
     Column("channel_start", Integer()),
     Column("channel_end", Integer()),
     Column("parameter_id", ForeignKey("parameters.parameter_id")),
-    Column("disk_id", Integer(), nullable=False),
-    Column("transition_id", Integer(), nullable=False),
-    Column("version", Integer(), nullable=False),
-    ForeignKeyConstraint(["disk_id", "transition_id", "version"], ["measurement_sets.disk_id", "measurement_sets.transition_id", "measurement_sets.version"], name="ms_id"),
-    Column("method_type_id", Integer()),
-    Column("method_version", String()),
+    Column("measurement_set_id", Integer(), ForeignKey("measurement_sets.measurement_set_id"), nullable=False),
+    Column("method_type_id", Integer(), ForeignKey("method_types.method_type_id")),
+    Column("method_version", String(), ForeignKey("method_implementations.method_version")),
     ForeignKeyConstraint(["method_type_id", "method_version"], ["method_implementations.method_type_id", "method_implementations.method_version"], name="method_implementation_id")
 )
 
 # what is the image of? image, bkg, amp, vis, dirty, etc...
-image_types = Table(
-    "image_types",
+cube_types = Table(
+    "cube_types",
     metadata,
-    Column("image_type_id", Integer(), primary_key=True),
-    Column("image_type", String(), unique=True)
+    Column("cube_type_id", Integer(), primary_key=True),
+    Column("cube_type", String(), unique=True, nullable=False)
 )
 
 # referencing or will reference a collection of images (pngs or jpgs) made from one of the products. 
@@ -152,26 +156,19 @@ cubes = Table(
     "cubes",
     metadata,
     Column("cube_id", Integer(), primary_key=True),
-    Column("run_id", ForeignKey("runs.run_id")),
-    Column("disk_id", Integer(), nullable=False),
-    Column("transition_id", Integer(), nullable=False),
-    Column("version", Integer(), nullable=False),
-    ForeignKeyConstraint(["disk_id", "transition_id", "version"], ["measurement_sets.disk_id", "measurement_sets.transition_id", "measurement_sets.version"], name="ms_id"),
-    Column("method_type_id", Integer()),
-    Column("method_version", String()),
-    ForeignKeyConstraint(["method_type_id", "method_version"], ["method_implementations.method_type_id", "method_implementations.method_version"], name="method_implementation_id")
+    Column("run_id", ForeignKey("runs.run_id"), nullable=False),
+    Column("cube_type_id", Integer(), ForeignKey("cube_types.cube_type_id"), nullable=False),
+    UniqueConstraint("run_id", "cube_type_id")
 )
 
-images = Table(
-    "images",
+cube_images = Table(
+    "cube_images",
     metadata,
-    Column("image_id", Integer(), primary_key=True),
-    Column("image_type_id", Integer(), ForeignKey("images.image_type_id")),
-    Column("cube_id", ForeignKey("cubes.cube_id")),
-    Column("run_id", ForeignKey("runs.run_id")),
-    Column("image_path", String()),
-    Column("channel", Integer()),
-    Column("velocity", Float())
+    Column("cube_image_id", Integer(), primary_key=True),
+    Column("cube_id", ForeignKey("cubes.cube_id"), nullable=False),
+    Column("image_path", String(), nullable=False, unique=True),
+    Column("channel", Integer(), nullable=False),
+    Column("frequency", Float())
 )
 
 

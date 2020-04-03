@@ -105,13 +105,14 @@ with engine.begin() as conn:
     for i, status in enumerate(["prepped", "submitted", "running",  "failed", "mpol_completed", "plot_completed"]):
         conn.execute(schema.run_statuses.insert().values(run_status_id=i, run_status=status))
 
-    for i, method_type in enumerate(["tclean", "rml"]):
+    for i, method_type in enumerate(["tclean", "rml", "rml-dirty"]):
         conn.execute(schema.method_types.insert().values(method_type_id=i, method_type=method_type))
 
-    conn.execute(schema.method_implementations.insert().values(method_type=0, method_version="v1")) # tclean v1
-    conn.execute(schema.method_implementations.insert().values(method_type=0,  method_version="v2")) # tclean v2
-    conn.execute(schema.method_implementations.insert().values(method_type=1, method_version=0)) # RML unspecified version
+    conn.execute(schema.method_implementations.insert().values(method_type_id=0, method_version="v1")) # tclean v1
+    conn.execute(schema.method_implementations.insert().values(method_type_id=0,  method_version="v2")) # tclean v2
+    conn.execute(schema.method_implementations.insert().values(method_type_id=1, method_version=0)) # RML unspecified version
+    conn.execute(schema.method_implementations.insert().values(method_type_id=2, method_version=0)) # RML-dirty unspecified version
 
     # cube types 
-    for i, image_type in enumerate(["image", "background", "dirty", "vis", "amplitude", "plot"]):
-        conn.execute(schema.image_types.insert().values(image_type_id=i, image_type=image_type))
+    for i, cube_type in enumerate(["image", "background", "vis_full", "vis_cell", "amplitude"]):
+        conn.execute(schema.cube_types.insert().values(cube_type_id=i, cube_type=cube_type))
