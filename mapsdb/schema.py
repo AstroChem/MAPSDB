@@ -103,7 +103,8 @@ method_implementations = Table(
     metadata,
     Column("method_type_id", ForeignKey("method_types.method_type_id")),
     Column("method_version", String()),
-    PrimaryKeyConstraint("method_type_id", "method_version", name="method_implementation_id")
+    PrimaryKeyConstraint("method_type_id", "method_version", name="method_implementation_id"),
+    UniqueConstraint("method_type_id", "method_version")
 )
 
 parameters = Table(
@@ -137,8 +138,8 @@ runs = Table(
     Column("channel_end", Integer()),
     Column("parameter_id", ForeignKey("parameters.parameter_id")),
     Column("measurement_set_id", Integer(), ForeignKey("measurement_sets.measurement_set_id"), nullable=False),
-    Column("method_type_id", Integer(), ForeignKey("method_types.method_type_id")),
-    Column("method_version", String(), ForeignKey("method_implementations.method_version")),
+    Column("method_type_id", Integer()),
+    Column("method_version", String()),
     ForeignKeyConstraint(["method_type_id", "method_version"], ["method_implementations.method_type_id", "method_implementations.method_version"], name="method_implementation_id")
 )
 
@@ -151,7 +152,7 @@ cube_types = Table(
 )
 
 # referencing or will reference a collection of images (pngs or jpgs) made from one of the products. 
-# # e.g., a dirty image,
+# e.g., a dirty image,
 cubes = Table(
     "cubes",
     metadata,
