@@ -9,15 +9,15 @@ from sqlalchemy import (
     ForeignKey,
     PrimaryKeyConstraint,
     ForeignKeyConstraint,
-    UniqueConstraint
+    UniqueConstraint,
 )
 
 convention = {
-  "ix": 'ix_%(column_0_label)s',
-  "uq": "uq_%(table_name)s_%(column_0_name)s",
-  "ck": "ck_%(table_name)s_%(constraint_name)s",
-  "fk": "fk_%(table_name)s_%(column_0_name)s_%(referred_table_name)s",
-  "pk": "pk_%(table_name)s"
+    "ix": "ix_%(column_0_label)s",
+    "uq": "uq_%(table_name)s_%(column_0_name)s",
+    "ck": "ck_%(table_name)s_%(constraint_name)s",
+    "fk": "fk_%(table_name)s_%(column_0_name)s_%(referred_table_name)s",
+    "pk": "pk_%(table_name)s",
 }
 
 metadata = MetaData(naming_convention=convention)
@@ -46,7 +46,7 @@ transitions = Table(
     Column("quantum_number", String()),
     Column("spw_id", ForeignKey("spws.spw_id")),
     Column("band_id", ForeignKey("bands.band_id")),
-    Column("setup_id", ForeignKey("setups.setup_id"))
+    Column("setup_id", ForeignKey("setups.setup_id")),
 )
 
 disks = Table(
@@ -76,9 +76,11 @@ measurement_sets = Table(
     Column("disk_id", ForeignKey("disks.disk_id"), nullable=False),
     Column("path", String(), unique=True),
     Column("version", String(), nullable=False),
-    Column("tar_md5sum", String(), unique=True), # the md5sum corresponding to the .tar.gz file ingested. 
+    Column(
+        "tar_md5sum", String(), unique=True
+    ),  # the md5sum corresponding to the .tar.gz file ingested.
     Column("ingested", DateTime()),
-    PrimaryKeyConstraint("measurement_set_id")
+    PrimaryKeyConstraint("measurement_set_id"),
 )
 
 # meant to be a reference table of prepped, submitted, running, completed, analysis, etc.
@@ -86,7 +88,7 @@ run_statuses = Table(
     "run_statuses",
     metadata,
     Column("run_status_id", Integer(), primary_key=True),
-    Column("run_status", String(), unique=True)
+    Column("run_status", String(), unique=True),
 )
 
 # reference table for tclean / RML
@@ -94,7 +96,7 @@ method_types = Table(
     "method_types",
     metadata,
     Column("method_type_id", Integer(), primary_key=True),
-    Column("method_type", String(), unique=True)
+    Column("method_type", String(), unique=True),
 )
 
 # MPoL dev 0.5, or tclean v2
@@ -103,8 +105,10 @@ method_implementations = Table(
     metadata,
     Column("method_type_id", ForeignKey("method_types.method_type_id")),
     Column("method_version", String()),
-    PrimaryKeyConstraint("method_type_id", "method_version", name="method_implementation_id"),
-    UniqueConstraint("method_type_id", "method_version")
+    PrimaryKeyConstraint(
+        "method_type_id", "method_version", name="method_implementation_id"
+    ),
+    UniqueConstraint("method_type_id", "method_version"),
 )
 
 parameters = Table(
@@ -120,7 +124,7 @@ parameters = Table(
     Column("penalty_tsv", Float()),
     Column("robust", Float()),
     Column("penalty_PSD", Float()),
-    Column("PSD_l", Float())
+    Column("PSD_l", Float()),
 )
 
 # summarizing how we prepare and track all SLURM runs for RML
@@ -137,14 +141,26 @@ runs = Table(
     Column("channel_start", Integer()),
     Column("channel_end", Integer()),
     Column("parameter_id", ForeignKey("parameters.parameter_id")),
-    Column("measurement_set_id", Integer(), ForeignKey("measurement_sets.measurement_set_id"), nullable=False),
+    Column(
+        "measurement_set_id",
+        Integer(),
+        ForeignKey("measurement_sets.measurement_set_id"),
+        nullable=False,
+    ),
     Column("method_type_id", Integer()),
     Column("method_version", String()),
+    Column("bkgd_mean", Float(), nullable=True),
     Column("bkgd_rms", Float(), nullable=True),
     Column("peak_flux", Float(), nullable=True),
     Column("tot_flux", Float(), nullable=True),
-    ForeignKeyConstraint(["method_type_id", "method_version"], ["method_implementations.method_type_id", "method_implementations.method_version"], name="method_implementation_id")
-
+    ForeignKeyConstraint(
+        ["method_type_id", "method_version"],
+        [
+            "method_implementations.method_type_id",
+            "method_implementations.method_version",
+        ],
+        name="method_implementation_id",
+    ),
 )
 
 # what is the image of? image, bkg, amp, vis, dirty, etc...
@@ -152,18 +168,20 @@ cube_types = Table(
     "cube_types",
     metadata,
     Column("cube_type_id", Integer(), primary_key=True),
-    Column("cube_type", String(), unique=True, nullable=False)
+    Column("cube_type", String(), unique=True, nullable=False),
 )
 
-# referencing or will reference a collection of images (pngs or jpgs) made from one of the products. 
+# referencing or will reference a collection of images (pngs or jpgs) made from one of the products.
 # e.g., a dirty image,
 cubes = Table(
     "cubes",
     metadata,
     Column("cube_id", Integer(), primary_key=True),
     Column("run_id", ForeignKey("runs.run_id"), nullable=False),
-    Column("cube_type_id", Integer(), ForeignKey("cube_types.cube_type_id"), nullable=False),
-    UniqueConstraint("run_id", "cube_type_id")
+    Column(
+        "cube_type_id", Integer(), ForeignKey("cube_types.cube_type_id"), nullable=False
+    ),
+    UniqueConstraint("run_id", "cube_type_id"),
 )
 
 cube_images = Table(
@@ -173,7 +191,5 @@ cube_images = Table(
     Column("cube_id", ForeignKey("cubes.cube_id"), nullable=False),
     Column("image_path", String(), nullable=False, unique=True),
     Column("channel", Integer(), nullable=False),
-    Column("frequency", Float())
+    Column("frequency", Float()),
 )
-
-
