@@ -5,9 +5,16 @@ from sqlalchemy import pool
 
 from alembic import context
 
+import os
+
 # this is the Alembic Config object, which provides
 # access to the values within the .ini file in use.
 config = context.config
+
+# here we allow ourselves to pass interpolation vars to alembic.ini
+# from the host env
+section = config.config_ini_section
+config.set_section_option(section, "DATABASE_URI", os.environ.get("DATABASE_URI"))
 
 # Interpret the config file for Python logging.
 # This line sets up loggers basically.
@@ -16,6 +23,7 @@ fileConfig(config.config_file_name)
 # add your model's MetaData object here
 # for 'autogenerate' support
 from mapsdb import schema
+
 target_metadata = schema.metadata
 
 # other values from the config, defined by the needs of env.py,
@@ -63,8 +71,7 @@ def run_migrations_online():
 
     with connectable.connect() as connection:
         context.configure(
-            connection=connection, target_metadata=target_metadata,
-            render_as_batch=True
+            connection=connection, target_metadata=target_metadata, render_as_batch=True
         )
 
         with context.begin_transaction():

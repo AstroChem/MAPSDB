@@ -140,7 +140,11 @@ runs = Table(
     Column("measurement_set_id", Integer(), ForeignKey("measurement_sets.measurement_set_id"), nullable=False),
     Column("method_type_id", Integer()),
     Column("method_version", String()),
+    Column("bkgd_rms", Float(), nullable=True),
+    Column("peak_flux", Float(), nullable=True),
+    Column("tot_flux", Float(), nullable=True),
     ForeignKeyConstraint(["method_type_id", "method_version"], ["method_implementations.method_type_id", "method_implementations.method_version"], name="method_implementation_id")
+
 )
 
 # what is the image of? image, bkg, amp, vis, dirty, etc...

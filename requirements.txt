@@ -1,3 +1,4 @@
 sqlalchemy
 numpy
 alembic
+psycopg2-binary
