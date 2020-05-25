@@ -5,6 +5,7 @@ from sqlalchemy import (
     Integer,
     Float,
     String,
+    Boolean,
     DateTime,
     ForeignKey,
     PrimaryKeyConstraint,
@@ -111,6 +112,13 @@ method_implementations = Table(
     UniqueConstraint("method_type_id", "method_version"),
 )
 
+jvm_types = Table(
+    "jvm_types",
+    metadata,
+    Column("jvm_type_id", Integer(), primary_key=True),
+    Column("jvm_type", String(), unique=True),
+)
+
 parameters = Table(
     "parameters",
     metadata,
@@ -125,6 +133,9 @@ parameters = Table(
     Column("robust", Float()),
     Column("penalty_PSD", Float()),
     Column("PSD_l", Float()),
+    Column("jvm_type_id", ForeignKey("jvm_types.jvm_type_id"), nullable=True),
+    Column("pbcor", Boolean(), nullable=True),
+    Column("taper", Float(), nullable=True),
 )
 
 # summarizing how we prepare and track all SLURM runs for RML
